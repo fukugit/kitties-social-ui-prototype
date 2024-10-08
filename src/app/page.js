@@ -5,12 +5,12 @@ import styles from "./page.module.css";
 export default function Home() {
   return (
     <div className={styles.page}>
-      <Link href='login'>
-        login!!
-      </Link>
-      <Link href='top'>
-        top!!
-      </Link>
+      <div className={styles.link}>
+        <Link href='login'>login!!</Link>
+      </div>
+      <div className={styles.link_blue}>
+        <Link href='top'>top!!</Link>
+      </div>
     </div>
   );
 }
