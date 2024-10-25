@@ -15,7 +15,7 @@ export default function Home() {
         </div>
       ) : (
         <div className="flex justify-center items-center h-screen w-full bg-amber-300">
-          <p className="w-48">API doens't work...</p>
+          <p className="w-48">API does not work...</p>
         </div>
       )}
     </div>
