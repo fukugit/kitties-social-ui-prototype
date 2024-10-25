@@ -23,6 +23,15 @@ pnpm dev
 bun dev
 ```
 
+## Stopping the server
+```
+lsof -i -P | grep 3000
+kill -9 PID
+```
+
+## shadcn/ui
+This project is built with [Shadcn](https://ui.shadcn.com/).  
+
 
 ## Troubleshooting
 ### If you see the error below when running the command, execute the following nvm command.
