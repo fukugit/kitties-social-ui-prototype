@@ -56,13 +56,7 @@ export default function Home() {
               />
             </div>
 
-            <button
-              onClick={login}
-              className="w-full bg-blue-800 hover:bg-blue-900 text-white py-2 px-4 rounded">
-              ログイン
-            </button>
-
-            <Button className="w-full" size="lg" variant="default"
+            <Button className="w-full bg-blue-800 hover:bg-blue-900" size="lg" variant="default"
               onClick={login}>ログイン
             </Button>
 
