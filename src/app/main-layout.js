@@ -1,5 +1,6 @@
 "use client"
 import { usePathname } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 
 import { AppSidebar } from "@/components/app-sidebar"
 import {
@@ -19,6 +20,9 @@ import {
 
 export default function MainLayout({ children }) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const token = searchParams.get('token');
+
   return (
     <html lang="en">
       <body>
@@ -26,8 +30,9 @@ export default function MainLayout({ children }) {
           <SidebarProvider>
             <AppSidebar />
             <SidebarInset>
+            {(token) &&
               <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-                <SidebarTrigger className="-ml-1" />
+                 <SidebarTrigger className="-ml-1" />
                 <Separator orientation="vertical" className="mr-2 h-4" />
                 <Breadcrumb>
                   <BreadcrumbList>
@@ -43,6 +48,14 @@ export default function MainLayout({ children }) {
                   </BreadcrumbList>
                 </Breadcrumb>
               </header>
+            }
+            {(!token) &&
+              <header className="bg-red-300 flex h-16 shrink-0 items-center gap-2 border-b px-4">
+                 <SidebarTrigger className="-ml-1" />
+                <Separator orientation="vertical" className="mr-2 h-4" />
+                Loging error!
+              </header>
+            }
               {children}
             </SidebarInset>
           </SidebarProvider>

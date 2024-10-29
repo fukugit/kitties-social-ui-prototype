@@ -22,7 +22,7 @@ export default function Home() {
         const token = response.data.access_token
         router.push(`/top?token=${encodeURIComponent(token)}`);
       } else {
-        router.push('/error')
+        router.push('/top')
       }
     })
     .catch( (error) => {
