@@ -29,7 +29,7 @@ const data = {
         },
         {
           title: "猫保有情報",
-          url: "/registration",
+          url: "/registration/pre",
         },
         {
           title: "ログアウト",
