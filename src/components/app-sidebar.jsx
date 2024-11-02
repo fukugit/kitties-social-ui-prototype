@@ -35,6 +35,10 @@ const data = {
           title: "ログアウト",
           url: "/",
         },
+        {
+          title: "開発用ツール",
+          url: "/development",
+        },
       ],
     },
   ],
