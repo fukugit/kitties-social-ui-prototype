@@ -14,6 +14,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import StepBar from "@/app/stepbar/stepbar";
 
 export default function Component() {
   const router = useRouter()
@@ -61,25 +62,7 @@ export default function Component() {
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-8">
       {/* Progress Steps */}
-      <div className="relative">
-        <div className="flex justify-between mb-4">
-          <div className="flex flex-col items-center">
-            <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm">1</div>
-            <span className="text-sm mt-1">入力</span>
-          </div>
-          <div className="flex flex-col items-center">
-            <div className="w-6 h-6 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-sm">2</div>
-            <span className="text-sm mt-1">確認</span>
-          </div>
-          <div className="flex flex-col items-center">
-            <div className="w-6 h-6 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-sm">3</div>
-            <span className="text-sm mt-1">支払い</span>
-          </div>
-        </div>
-        <div className="absolute top-3 left-0 right-0 h-[2px] bg-muted -z-10">
-          <div className="h-full bg-primary w-1/3" />
-        </div>
-      </div>
+      <StepBar/>
 
       <div className="space-y-4">
         <h1 className="text-2xl font-bold">猫登録</h1>
