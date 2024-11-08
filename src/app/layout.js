@@ -6,14 +6,10 @@ import MainLayout from './main-layout';
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body>
       <Suspense fallback={<div>Loading...</div>}>
         <MainLayout>
           {children}
         </MainLayout>
       </Suspense>
-      </body>
-    </html>
   );
 }
