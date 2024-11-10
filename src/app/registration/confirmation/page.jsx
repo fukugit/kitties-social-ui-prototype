@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Trash2 } from 'lucide-react'
 
@@ -10,14 +11,20 @@ import StepBar from "@/app/stepbar/stepbar";
 
 export default function Component() {
   const router = useRouter()
+  
+  const [image, setImage] = useState(null);
 
-  // In a real application, you would fetch this data from your state management solution or API
-  const mockData = {
-    fileName: '血統書01.jpg',
-    fileSize: '200 KB',
-    previewUrl: '/placeholder.svg?height=400&width=300',
-    callName: 'タマ'
-  }
+  useEffect(() => {
+    // ページロード時にlocalStorageから画像を取得
+    const storedImage = localStorage.getItem('uploadedImage');
+    console.log(storedImage)
+    if (storedImage) {
+      
+      setImage(storedImage);
+    }
+  }, []);
+
+  
 
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-8">
@@ -25,7 +32,7 @@ export default function Component() {
       <StepBar/>
 
       <div className="space-y-4">
-        <h1 className="text-2xl font-bold">猫登録確認</h1>
+        <h1 className="text-2xl font-bold">入力情報確認</h1>
         <p className="text-muted-foreground">
           登録内容をご確認ください。問題がなければ、支払い手続きへお進みください。
         </p>
@@ -35,8 +42,8 @@ export default function Component() {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className="text-sm space-y-1">
-              <p className="font-medium">{mockData.fileName}</p>
-              <p className="text-muted-foreground">{mockData.fileSize}</p>
+              <p className="font-medium">aaa</p>
+              <p className="text-muted-foreground">bbb</p>
             </div>
           </div>
           <Button variant="ghost" size="icon" disabled>
@@ -44,10 +51,10 @@ export default function Component() {
           </Button>
         </div>
         <div className="mt-4 space-y-4">
-          <img src={mockData.previewUrl} alt="Preview" className="max-w-full h-auto rounded-lg" />
+          <img src={image} alt="Preview" className="max-w-full h-auto rounded-lg" />
           <div className="flex items-center gap-2">
             <Input
-              value={mockData.callName}
+              value="コールネーム"
               disabled
               className="max-w-sm bg-muted"
             />

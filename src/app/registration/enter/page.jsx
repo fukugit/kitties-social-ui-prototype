@@ -27,7 +27,12 @@ export default function Component() {
     const file = acceptedFiles[0]
     if (file) {
       setUploadedFile(file)
-      setPreviewUrl(URL.createObjectURL(file))
+      const imageUrl = URL.createObjectURL(file);
+      setUploadedFile({ file, preview: imageUrl });
+      // 画像URLをlocalStorageに保存
+      localStorage.setItem('uploadedImage', imageUrl);
+      // プレビュー表示
+      setPreviewUrl(imageUrl)
       // Simulate upload progress
       setUploadProgress(0)
       const interval = setInterval(() => {
@@ -58,6 +63,15 @@ export default function Component() {
     setUploadProgress(0)
     setCallName('')
   }
+
+  const handleSetCallName = (e) => {
+    setCallName(e.target.value); // 入力された値を更新
+  };
+
+  const handleNextpage = () => {
+    router.push('/registration/confirmation');
+    
+  };
 
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-8">
@@ -92,7 +106,7 @@ export default function Component() {
                 <Input
                   placeholder="コールネームを追加"
                   value={callName}
-                  onChange={(e) => setCallName(e.target.value)}
+                  onChange={handleSetCallName}
                   className="max-w-sm"
                 />
                 <TooltipProvider>
@@ -134,7 +148,7 @@ export default function Component() {
           戻る
         </Button>
         <Button
-          onClick={() => router.push('/registration/confirmation')}
+          onClick={handleNextpage}
           disabled={!uploadedFile}
         >
           登録内容を確認する
