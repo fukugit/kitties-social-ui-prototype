@@ -13,7 +13,8 @@ export default function Home() {
   const [password, setPassword] = useState("");
 
   const login = () => {
-    axios.post('http://127.0.0.1:5000/auth', {
+    // TODO Should be switched to correct URL following environment automatically.
+    axios.post('https://kitties-api.vercel.app/auth', {
       id: mail,
       pw: password
     })
@@ -22,11 +23,11 @@ export default function Home() {
         const token = response.data.access_token
         router.push(`/top?token=${encodeURIComponent(token)}`);
       } else {
-        router.push('/top')
+        router.push('/error')
       }
     })
     .catch( (error) => {
-      router.push('/top')
+      router.push('/error')
     })
   }
   return (
