@@ -26,7 +26,7 @@ export default function MainLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        {(pathname !== '/' && pathname !== '/signup') &&
+        {(pathname !== '/' && pathname !== '/signup' && pathname !== '/error') &&
           <SidebarProvider>
             <AppSidebar />
             <SidebarInset>
@@ -60,7 +60,7 @@ export default function MainLayout({ children }) {
             </SidebarInset>
           </SidebarProvider>
         }
-        {(pathname == '/' || pathname == '/signup') &&
+        {(pathname == '/' || pathname == '/signup' || pathname == '/error') &&
           <main>
             {children}
           </main>}
