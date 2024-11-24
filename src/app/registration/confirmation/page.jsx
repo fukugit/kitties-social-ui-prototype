@@ -2,8 +2,9 @@
 
 import React from 'react'
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Trash2 } from 'lucide-react'
+import axios from "axios";
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,6 +12,9 @@ import StepBar from "@/app/stepbar/stepbar";
 
 export default function Component() {
   const router = useRouter()
+  const searchParams = useSearchParams();
+  const nickName = searchParams.get('nickName'); // クエリパラメータからNickNameを取得
+
   
   const [image, setImage] = useState(null);
 
@@ -23,6 +27,40 @@ export default function Component() {
       setImage(storedImage);
     }
   }, []);
+
+  //画像登録＆支払い処理
+  const handlePayment = async() => {
+    //console.log("Hi")
+    if (!image) {
+      alert('画像を選択してください');
+      return;
+    }
+
+    // Blob URLからBlobオブジェクトを取得
+    const blob = await fetch(image).then((res) => res.blob());
+
+    const formData = new FormData();
+    formData.append('nickname',nickName);
+    // formData.append('file', image);
+    formData.append('file', blob, 'uploaded-image.jpg'); // ファイル名を指定
+    console.log(image);
+
+    try {
+      // JWTトークンを取得（ここではlocalStorageから取得する例を示します）
+      // const token = localStorage.getItem('jwtToken'); // トークンの保存場所に応じて変更してください
+
+      const response = await axios.post('http://127.0.0.1:5000/file/pedigree', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          // 'Authorization': `Bearer ${token}` // JWTトークンをAuthorizationヘッダーに追加
+        },
+      });
+      //console.log(response.data)
+      console.log('成功:', response.data);
+    } catch (error) {
+      console.error('エラー:', error);
+    }    
+  };
 
   
 
@@ -54,7 +92,7 @@ export default function Component() {
           <img src={image} alt="Preview" className="max-w-full h-auto rounded-lg" />
           <div className="flex items-center gap-2">
             <Input
-              value="コールネーム"
+              value={nickName}
               disabled
               className="max-w-sm bg-muted"
             />
@@ -70,7 +108,7 @@ export default function Component() {
           戻る
         </Button>
         <Button
-          onClick={() => router.push('/registration/payment')}
+          onClick={handlePayment}
         >
           支払い手続き
         </Button>
