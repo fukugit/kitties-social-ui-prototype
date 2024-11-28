@@ -21,12 +21,12 @@ export default function Component() {
   const [uploadedFile, setUploadedFile] = useState(null)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [previewUrl, setPreviewUrl] = useState('')
-  const [callName, setCallName] = useState('')
+  const [nickName, setNickName] = useState('')
 
   const onDrop = useCallback((acceptedFiles) => {
     const file = acceptedFiles[0]
     if (file) {
-      setUploadedFile(file)
+      // setUploadedFile(file)
       const imageUrl = URL.createObjectURL(file);
       setUploadedFile({ file, preview: imageUrl });
       // 画像URLをlocalStorageに保存
@@ -61,16 +61,15 @@ export default function Component() {
     setUploadedFile(null)
     setPreviewUrl('')
     setUploadProgress(0)
-    setCallName('')
+    setNickName('')
   }
 
-  const handleSetCallName = (e) => {
-    setCallName(e.target.value); // 入力された値を更新
+  const handleSetNickName = (e) => {
+    setNickName(e.target.value); // 入力された値を更新
   };
 
   const handleNextpage = () => {
-    router.push('/registration/confirmation');
-    
+    router.push(`/registration/confirmation?nickName=${encodeURIComponent(nickName)}`);
   };
 
   return (
@@ -105,8 +104,8 @@ export default function Component() {
               <div className="flex items-center gap-2">
                 <Input
                   placeholder="コールネームを追加"
-                  value={callName}
-                  onChange={handleSetCallName}
+                  value={nickName}
+                  onChange={handleSetNickName}
                   className="max-w-sm"
                 />
                 <TooltipProvider>
