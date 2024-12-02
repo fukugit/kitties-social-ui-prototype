@@ -1,10 +1,9 @@
 'use client'
-import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
 import { useRouter } from 'next/navigation';
-import axios from "axios";
 import { Button } from "@/components/ui/button"
+import { userLogin } from "@/service/authService";
 
 export default function Home() {
   const router = useRouter();
@@ -12,23 +11,15 @@ export default function Home() {
   const [mail, setMail] = useState("");
   const [password, setPassword] = useState("");
 
-  const login = () => {
+  const login = async () => {
     // TODO Should be switched to correct URL following environment automatically.
-    axios.post('https://kitties-api.vercel.app/auth', {
-      id: mail,
-      pw: password
-    })
-    .then( (response) => {
-      if (response.data.result === 'success') {
-        const token = response.data.access_token
-        router.push(`/top?token=${encodeURIComponent(token)}`);
-      } else {
-        router.push('/error')
-      }
-    })
-    .catch( (error) => {
-      router.push('/error')
-    })
+    try {
+      const response = await userLogin(mail, password);
+      const token = response.data.access_token
+      router.push(`/top?token=${encodeURIComponent(token)}`);
+    } catch {
+      router.push('/top')
+    }
   }
   return (
     <>

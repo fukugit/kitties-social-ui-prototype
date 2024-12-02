@@ -4,7 +4,7 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Trash2 } from 'lucide-react'
-import axios from "axios";
+import { pedigreeUpload } from "@/service/pedigreeService";
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -48,14 +48,7 @@ export default function Component() {
     try {
       // JWTトークンを取得（ここではlocalStorageから取得する例を示します）
       // const token = localStorage.getItem('jwtToken'); // トークンの保存場所に応じて変更してください
-
-      const response = await axios.post('http://127.0.0.1:5000/file/pedigree', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          // 'Authorization': `Bearer ${token}` // JWTトークンをAuthorizationヘッダーに追加
-        },
-      });
-      //console.log(response.data)
+      const response = await pedigreeUpload(formData)
       console.log('成功:', response.data);
     } catch (error) {
       console.error('エラー:', error);
