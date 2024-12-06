@@ -22,6 +22,7 @@ export default function Component() {
   const [uploadProgress, setUploadProgress] = useState(0)
   const [previewUrl, setPreviewUrl] = useState('')
   const [nickName, setNickName] = useState('')
+  const [error, setError] = useState('')
 
   const onDrop = useCallback((acceptedFiles) => {
     const file = acceptedFiles[0]
@@ -65,7 +66,17 @@ export default function Component() {
   }
 
   const handleSetNickName = (e) => {
-    setNickName(e.target.value); // 入力された値を更新
+    const value = e.target.value;
+    // 正規表現: 文字列のみ許可
+    const isValid = /^[a-zA-Zぁ-んァ-ン一-龥ａ-ｚＡ-Ｚ\s]*$/.test(value);
+
+    if (isValid) {
+      setNickName(value); // 入力された値を更新
+      setError(''); // エラーをクリア
+    } else {
+      setError('コールネームには文字のみ入力してください'); // エラーメッセージを設定
+    }
+    
   };
 
   const handleNextpage = () => {
