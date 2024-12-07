@@ -30,29 +30,33 @@ export default function Component() {
 
   //画像登録＆支払い処理
   const handlePayment = async() => {
-    //console.log("Hi")
-    if (!image) {
-      alert('画像を選択してください');
-      return;
-    }
+    // //console.log("Hi")
+    // if (!image) {
+    //   alert('画像を選択してください');
+    //   return;
+    // }
 
-    // Blob URLからBlobオブジェクトを取得
-    const blob = await fetch(image).then((res) => res.blob());
+    // // Blob URLからBlobオブジェクトを取得
+    // const blob = await fetch(image).then((res) => res.blob());
 
-    const formData = new FormData();
-    formData.append('nickname',nickName);
-    // formData.append('file', image);
-    formData.append('file', blob, 'uploaded-image.jpg'); // ファイル名を指定
-    console.log(image);
+    // const formData = new FormData();
+    // formData.append('nickname',nickName);
+    // // formData.append('file', image);
+    // formData.append('file', blob, 'uploaded-image.jpg'); // ファイル名を指定
+    // console.log(image);
 
-    try {
-      // JWTトークンを取得（ここではlocalStorageから取得する例を示します）
-      // const token = localStorage.getItem('jwtToken'); // トークンの保存場所に応じて変更してください
-      const response = await pedigreeUpload(formData)
-      console.log('成功:', response.data);
-    } catch (error) {
-      console.error('エラー:', error);
-    }    
+    // try {
+    //   // JWTトークンを取得（ここではlocalStorageから取得する例を示します）
+    //   // const token = localStorage.getItem('jwtToken'); // トークンの保存場所に応じて変更してください
+    //   const response = await pedigreeUpload(formData)
+    //   console.log('成功:', response.data);
+    // } catch (error) {
+    //   console.error('エラー:', error);
+    // }  
+    
+    //stripe pageに遷移
+    router.push('../stripe');
+
   };
 
   
