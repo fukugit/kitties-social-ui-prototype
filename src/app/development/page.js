@@ -27,6 +27,11 @@ export default function Registration() {
     router.push('../stripe/product');
   }
 
+  // stripeの商品登録ページに遷移する
+  const checkout = () => {
+    router.push('../stripe/checkout');
+  }
+
   return (
     <>
       <div className="flex justify-center h-screen w-full mt-10">
@@ -36,7 +41,10 @@ export default function Registration() {
             onClick={run_add}>/cat/add
           </Button>
           <Button className="mt-20 w-full bg-green-400 hover:bg-blue-900" size="lg" variant="default"
-            onClick={product_add}>/stripe
+            onClick={product_add}>/stripe/product
+          </Button>
+          <Button className="mt-20 w-full bg-green-400 hover:bg-blue-900" size="lg" variant="default"
+            onClick={checkout}>/stripe/checkout
           </Button>
         </div>
 

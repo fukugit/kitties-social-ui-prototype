@@ -15,7 +15,9 @@ switch(appEnv) {
 
 const nextConfig = {
     env: {
-        NEXT_PUBLIC_BASE_URL: envConfig.baseUrl
+        NEXT_PUBLIC_BASE_URL: envConfig.baseUrl,
+        NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: localConfig.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+        STRIPE_SECRET_KEY: localConfig.STRIPE_SECRET_KEY,
     },
 }
 
