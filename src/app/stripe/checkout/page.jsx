@@ -1,31 +1,31 @@
 'use client';
 
-import React,{ useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import CheckoutForm from '@/components/checkoutForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { createPaymentIntent } from '@/service/checkoutService';
+import { createPaymentIntent } from '@/service/checkoutService'; // サーバーとの通信ロジック
 
 export default function Home() {
-  const [clientSecret, setClientSecret] = useState('');
   const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+  const [clientSecret, setClientSecret] = useState(null);
 
   useEffect(() => {
-
-    //PaymentIntent
+    //console.log('Request URL:', `${process.env.NEXT_PUBLIC_BASE_URL}/payment_intent/createpaymentintent`);
+    console.log("アクセススタート");
+    // サーバーからclientSecretを取得
     createPaymentIntent({
-      amount: 2000,
-      currency: 'JPY',
-      payment_method_types: 'card'
+      amount: 2000, // 金額
+      currency:  'JPY', // 通貨
+      payment_method_types: 'card', // 支払い方法
     })
       .then((data) => {
+        //console.log(data.data.clientSecret)
         setClientSecret(data.data.clientSecret);
-        console.log('setClientSecretは成功しました');
       })
       .catch((error) => {
-        setMessage('決済の初期化に失敗しました。');
-        console.error('Error:', error);
+        console.error('Error retrieving payment intent:', error);
       });
   }, []);
 
@@ -38,16 +38,15 @@ export default function Home() {
           <CardDescription>カード情報を入力して決済を完了してください。</CardDescription>
         </CardHeader>
         <CardContent>
-        {clientSecret ? (
-          <Elements stripe={stripePromise} options={{ clientSecret }}>
-            <CheckoutForm />
-          </Elements>
-        ) : (
-          <p>Loading payment form...</p>
-        )}
-      </CardContent>
+          {clientSecret ? (
+            <Elements stripe={stripePromise} options={{ clientSecret }}>
+              <CheckoutForm />
+            </Elements>
+          ) : (
+            <p>Loading payment form...</p>
+          )}
+        </CardContent>
       </Card>
     </div>
   );
 }
-

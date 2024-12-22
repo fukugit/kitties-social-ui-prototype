@@ -26,6 +26,10 @@ export default function Registration() {
   const product_add = () => {
     router.push('../stripe/product');
   }
+  // stripeの決済ページ
+  const product_checkout = () => {
+    router.push('../stripe/checkout');
+  }
 
   return (
     <>
@@ -37,6 +41,9 @@ export default function Registration() {
           </Button>
           <Button className="mt-20 w-full bg-green-400 hover:bg-blue-900" size="lg" variant="default"
             onClick={product_add}>/stripe
+          </Button>
+          <Button className="mt-20 w-full bg-green-400 hover:bg-blue-900" size="lg" variant="default"
+            onClick={product_checkout}>/stripe/checkout
           </Button>
         </div>
 
