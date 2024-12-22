@@ -1,65 +1,135 @@
 'use client'
 
-import React from 'react'
-import { useState, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { Trash2 } from 'lucide-react'
-import { pedigreeUpload } from "@/service/pedigreeService";
+import React, { useState, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
+import { Upload, Trash2, HelpCircle } from 'lucide-react'
+import { useDropzone } from 'react-dropzone'
 
 import { Button } from '@/components/ui/button'
+import { Progress } from '@/components/ui/progress'
 import { Input } from '@/components/ui/input'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import StepBar from "@/app/stepbar/stepbar";
 
 export default function Component() {
   const router = useRouter()
-  const searchParams = useSearchParams();
-  const nickName = searchParams.get('nickName'); // クエリパラメータからNickNameを取得
+  const [uploadedFile, setUploadedFile] = useState(null)
+  const [uploadProgress, setUploadProgress] = useState(0)
+  const [previewUrl, setPreviewUrl] = useState('')
+  const [nickName, setNickName] = useState('')
+  const [error, setError] = useState('')
 
-  
-  const [image, setImage] = useState(null);
+  const onDrop = useCallback((acceptedFiles, rejectedFiles) => {
+    const file = acceptedFiles[0];
 
-  useEffect(() => {
-    // ページロード時にlocalStorageから画像を取得
-    const storedImage = localStorage.getItem('uploadedImage');
-    console.log(storedImage)
-    if (storedImage) {
-      
-      setImage(storedImage);
-    }
-  }, []);
-
-  //画像登録＆支払い処理
-  const handlePayment = async() => {
-    //console.log("Hi")
-    if (!image) {
-      alert('画像を選択してください');
+    if (rejectedFiles.length > 0) {
+      setError('ファイル形式またはサイズが不正です');
       return;
     }
 
-    // Blob URLからBlobオブジェクトを取得
-    const blob = await fetch(image).then((res) => res.blob());
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setUploadedFile({ file, preview: imageUrl });
+      localStorage.setItem('uploadedImage', imageUrl);
+      setPreviewUrl(imageUrl);
+      setUploadProgress(0);
 
-    const formData = new FormData();
-    formData.append('nickname',nickName);
-    // formData.append('file', image);
-    formData.append('file', blob, 'uploaded-image.jpg'); // ファイル名を指定
-    console.log(image);
+      const interval = setInterval(() => {
+        setUploadProgress((prev) => {
+          if (prev >= 100) {
+            clearInterval(interval);
+            return 100;
+          }
+          return prev + 10;
+        });
+      }, 200);
 
-    try {
-      // JWTトークンを取得（ここではlocalStorageから取得する例を示します）
-      // const token = localStorage.getItem('jwtToken'); // トークンの保存場所に応じて変更してください
-      const response = await pedigreeUpload(formData)
-      console.log('成功:', response.data);
-    } catch (error) {
-      console.error('エラー:', error);
-    }  
-    
-    //stripe 決済pageに遷移
-    //router.push('../stripe');
+      setError(''); // エラーをクリア
+    }
+  }, []);
 
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      'image/jpeg': ['.jpg', '.jpeg'],
+      'image/png': ['.png'],
+    },
+    maxSize: 5242880, // 5MB
+    multiple: false,
+  });
+
+  const handleDelete = () => {
+    setUploadedFile(null);
+    setPreviewUrl('');
+    setUploadProgress(0);
+    setNickName('');
+    setError('');
   };
 
-  
+  const validateNickName = (value) => {
+    const maxLength = 20;
+    const pattern = /^[ぁ-んァ-ヶ一-龥０-９0-9]+$/;
+
+    if (!pattern.test(value)) {
+      return 'コールネームには全角文字（ひらがな、カタカナ、漢字、数字）のみを入力してください';
+    }
+
+    if (value.length > maxLength) {
+      return `コールネームは最大${maxLength}文字までです`;
+    }
+
+    // ここで既存のニックネームとの重複をチェック
+    const existingNickNames = ['猫1', '猫2']; // 仮の既存データ
+    if (existingNickNames.includes(value)) {
+      return 'コールネームが重複しています';
+    }
+
+    return ''; // エラーなし
+  };
+
+  const handleSetNickName = (e) => {
+    const value = e.target.value;
+    setNickName(value);
+};
+
+  const handleNextpage = () => {
+    const maxLength = 20;
+    const pattern = /^[ぁ-んァ-ヶ一-龥０-９0-9]+$/;
+
+    if (!uploadedFile) {
+        alert('画像をアップロードしてください');
+        return;
+    }
+
+    if (!nickName) {
+        alert('コールネームを入力してください');
+        return;
+    }
+
+    if (!pattern.test(nickName)) {
+        alert('コールネームには全角文字（ひらがな、カタカナ、漢字、数字）のみを入力してください');
+        return;
+    }
+
+    if (nickName.length > maxLength) {
+        alert(`コールネームは最大${maxLength}文字までです`);
+        return;
+    }
+
+    // 既存のニックネームとの重複チェック
+    const existingNickNames = ['猫1', '猫2']; // 仮の既存データ
+    if (existingNickNames.includes(nickName)) {
+        alert('コールネームが重複しています');
+        return;
+    }
+
+    router.push(`/registration/confirmation?nickName=${encodeURIComponent(nickName)}`);
+};
 
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-8">
@@ -67,45 +137,80 @@ export default function Component() {
       <StepBar currentStep={2}/>
 
       <div className="space-y-4">
-        <h1 className="text-2xl font-bold">入力情報確認</h1>
+        <h1 className="text-2xl font-bold">猫登録</h1>
         <p className="text-muted-foreground">
-          登録内容をご確認ください。問題がなければ、支払い手続きへお進みください。
+          血統書の情報から親猫情報を登録します。登録する猫の頭数分の血統書をアップロードしてください。
         </p>
       </div>
 
-      <div className="border rounded-lg p-4 space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="text-sm space-y-1">
+      {uploadedFile ? (
+        <div className="border rounded-lg p-4 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="text-sm space-y-1">
+                <p className="font-medium">{uploadedFile.file.name}</p>
+                <p className="text-muted-foreground">{Math.round(uploadedFile.file.size / 1024)} KB</p>
+              </div>
             </div>
+            <Button variant="ghost" size="icon" onClick={handleDelete}>
+              <Trash2 className="h-5 w-5" />
+            </Button>
           </div>
-          <Button variant="ghost" size="icon" disabled>
-            <Trash2 className="h-5 w-5" />
-          </Button>
+          <Progress value={uploadProgress} className="w-full" />
+          {previewUrl && (
+            <div className="mt-4 space-y-4">
+              <img src={previewUrl} alt="Preview" className="max-w-full h-auto rounded-lg" />
+              <div className="flex items-center gap-2">
+                <Input
+                  placeholder="コールネームを追加"
+                  value={nickName}
+                  onChange={handleSetNickName}
+                  className="max-w-sm"
+                />
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <HelpCircle className="h-5 w-5" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
+                      <p>コールネーム（呼び方など）を追加してください。後から修正することもできます。コールネームは、親猫を識別する際に使用します。</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              {error && <p className="text-red-500 text-sm">{error}</p>}
+            </div>
+          )}
         </div>
-        <div className="mt-4 space-y-4">
-          <img src={image} alt="Preview" className="max-w-full h-auto rounded-lg" />
-          <div className="flex items-center gap-2">
-            <Input
-              value={nickName}
-              disabled
-              className="max-w-sm bg-muted"
-            />
-          </div>
+      ) : (
+        <div
+          {...getRootProps()}
+          className={`border-2 border-dashed rounded-lg p-8 text-center hover:bg-muted/50 transition-colors cursor-pointer ${
+            isDragActive ? 'border-primary' : 'border-muted-foreground/25'
+          }`}
+        >
+          <input {...getInputProps()} />
+          <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
+          <p className="mt-2 text-sm font-medium">クリックしてアップロード</p>
+          <p className="text-xs text-muted-foreground mt-1">またはドラッグアンドドロップ</p>
+          <p className="text-xs text-muted-foreground mt-1">PNG、またはJPG (最大800×400px)</p>
         </div>
-      </div>
+      )}
 
       <div className="flex justify-between pt-4">
         <Button
           variant="outline"
-          onClick={() => router.push('/registration/enter')}
+          onClick={() => router.push('/registration/pre')}
         >
           戻る
         </Button>
         <Button
-          onClick={handlePayment}
+          onClick={handleNextpage}
+          disabled={!uploadedFile || !nickName || error}
         >
-          支払い手続き
+          登録内容を確認する
         </Button>
       </div>
     </div>
