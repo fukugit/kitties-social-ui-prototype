@@ -13,7 +13,7 @@ export default function Home() {
 
   useEffect(() => {
     //console.log('Request URL:', `${process.env.NEXT_PUBLIC_BASE_URL}/payment_intent/createpaymentintent`);
-    console.log("アクセススタート");
+    //console.log("アクセススタート");
     // サーバーからclientSecretを取得
     createPaymentIntent({
       amount: 2000, // 金額
