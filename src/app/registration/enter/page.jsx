@@ -33,11 +33,13 @@ export default function Component() {
     }
 
     if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setUploadedFile({ file, preview: imageUrl });
-      localStorage.setItem('uploadedImage', imageUrl);
-      setPreviewUrl(imageUrl);
-      setUploadProgress(0);
+        const imageUrl = URL.createObjectURL(file);
+        setUploadedFile({ file, preview: imageUrl });
+        localStorage.setItem('uploadedImage', imageUrl);
+        localStorage.setItem('uploadedFileName', file.name);
+        localStorage.setItem('uploadedFileSize', file.size);
+        setPreviewUrl(imageUrl);
+        setUploadProgress(0);
 
       const interval = setInterval(() => {
         setUploadProgress((prev) => {
@@ -73,10 +75,10 @@ export default function Component() {
 
   const validateNickName = (value) => {
     const maxLength = 20;
-    const pattern = /^[ぁ-んァ-ヶ一-龥０-９0-9]+$/;
+    const pattern = /^[ぁ-んァ-ヶ一-龥０-９0-9a-zA-Z]+$/;
 
     if (!pattern.test(value)) {
-      return 'コールネームには全角文字（ひらがな、カタカナ、漢字、数字）のみを入力してください';
+      return 'コールネームには全角文字（ひらがな、カタカナ、漢字、数字、アルファベット）のみを入力してください';
     }
 
     if (value.length > maxLength) {
@@ -99,7 +101,7 @@ export default function Component() {
 
   const handleNextpage = () => {
     const maxLength = 20;
-    const pattern = /^[ぁ-んァ-ヶ一-龥０-９0-9]+$/;
+    const pattern = /^[ぁ-んァ-ヶ一-龥０-９0-9a-zA-Z]+$/;
 
     if (!uploadedFile) {
         alert('画像をアップロードしてください');
@@ -112,7 +114,7 @@ export default function Component() {
     }
 
     if (!pattern.test(nickName)) {
-        alert('コールネームには全角文字（ひらがな、カタカナ、漢字、数字）のみを入力してください');
+      return 'コールネームには全角文字（ひらがな、カタカナ、漢字、数字、アルファベット）のみを入力してください';
         return;
     }
 
