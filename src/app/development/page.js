@@ -22,6 +22,15 @@ export default function Registration() {
     })
   }
 
+  // stripeの商品登録ページに遷移する
+  const product_add = () => {
+    router.push('../stripe/product');
+  }
+  // stripeの決済ページ
+  const product_checkout = () => {
+    router.push('../stripe/checkout');
+  }
+
   return (
     <>
       <div className="flex justify-center h-screen w-full mt-10">
@@ -29,6 +38,12 @@ export default function Registration() {
           <p className="text-2xl">開発者用ツール</p>
           <Button className="mt-20 w-full bg-blue-800 hover:bg-blue-900" size="lg" variant="default"
             onClick={run_add}>/cat/add
+          </Button>
+          <Button className="mt-20 w-full bg-green-400 hover:bg-blue-900" size="lg" variant="default"
+            onClick={product_add}>/stripe
+          </Button>
+          <Button className="mt-20 w-full bg-green-400 hover:bg-blue-900" size="lg" variant="default"
+            onClick={product_checkout}>/stripe/checkout
           </Button>
         </div>
 

@@ -1,66 +1,50 @@
 'use client'
 
-import React from 'react'
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Trash2 } from 'lucide-react'
-import { pedigreeUpload } from "@/service/pedigreeService";
-
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import StepBar from "@/app/stepbar/stepbar";
 
 export default function Component() {
   const router = useRouter()
   const searchParams = useSearchParams();
   const nickName = searchParams.get('nickName'); // クエリパラメータからNickNameを取得
-
+  const [fileName, setFileName] = useState('');
+  const [fileSize, setFileSize] = useState(0);
   
   const [image, setImage] = useState(null);
 
   useEffect(() => {
     // ページロード時にlocalStorageから画像を取得
     const storedImage = localStorage.getItem('uploadedImage');
-    console.log(storedImage)
+    const storedFileName = localStorage.getItem('uploadedFileName');
+    const storedFileSize = localStorage.getItem('uploadedFileSize');
+
+
     if (storedImage) {
-      
-      setImage(storedImage);
+      setImage({
+        preview: storedImage,
+        name: storedFileName,
+        size: storedFileSize ? Math.round(storedFileSize / 1024) : 0, // KBに変換
+      });
     }
   }, []);
+    
 
-  //画像登録＆支払い処理
-  const handlePayment = async() => {
-    //console.log("Hi")
+  const handlePayment = async () => {
     if (!image) {
       alert('画像を選択してください');
       return;
     }
 
-    // Blob URLからBlobオブジェクトを取得
-    const blob = await fetch(image).then((res) => res.blob());
-
-    const formData = new FormData();
-    formData.append('nickname',nickName);
-    // formData.append('file', image);
-    formData.append('file', blob, 'uploaded-image.jpg'); // ファイル名を指定
-    console.log(image);
-
-    try {
-      // JWTトークンを取得（ここではlocalStorageから取得する例を示します）
-      // const token = localStorage.getItem('jwtToken'); // トークンの保存場所に応じて変更してください
-      const response = await pedigreeUpload(formData)
-      console.log('成功:', response.data);
-    } catch (error) {
-      console.error('エラー:', error);
-    }    
+    router.push('../stripe');
   };
-
-  
 
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-8">
       {/* Progress Steps */}
-      <StepBar/>
+      <StepBar currentStep={2} />
 
       <div className="space-y-4">
         <h1 className="text-2xl font-bold">入力情報確認</h1>
@@ -69,34 +53,32 @@ export default function Component() {
         </p>
       </div>
 
-      <div className="border rounded-lg p-4 space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="text-sm space-y-1">
-              <p className="font-medium">aaa</p>
-              <p className="text-muted-foreground">bbb</p>
+      {image && (
+        <div className="border rounded-lg p-4 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="text-sm space-y-1">
+              <p className="font-medium">{image.name}</p>
+              <p className="text-muted-foreground">{image.size} KB</p>
+              </div>
+            </div>
+            <Button variant="ghost" size="icon" disabled>
+              <Trash2 className="h-5 w-5" />
+            </Button>
+          </div>
+          <div className="mt-4 space-y-4">
+            <img src={image.preview} alt="Preview" className="max-w-full h-auto rounded-lg" />
+            <div className="flex items-center gap-2">
+              <p className="max-w-sm bg-muted p-2 rounded">{nickName}</p>
             </div>
           </div>
-          <Button variant="ghost" size="icon" disabled>
-            <Trash2 className="h-5 w-5" />
-          </Button>
         </div>
-        <div className="mt-4 space-y-4">
-          <img src={image} alt="Preview" className="max-w-full h-auto rounded-lg" />
-          <div className="flex items-center gap-2">
-            <Input
-              value={nickName}
-              disabled
-              className="max-w-sm bg-muted"
-            />
-          </div>
-        </div>
-      </div>
+      )}
 
       <div className="flex justify-between pt-4">
         <Button
           variant="outline"
-          onClick={() => router.push('/registration/enter')}
+          onClick={() => router.push('/registration/pre')}
         >
           戻る
         </Button>
@@ -107,5 +89,5 @@ export default function Component() {
         </Button>
       </div>
     </div>
-  )
+  );
 }

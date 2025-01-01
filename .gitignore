@@ -35,5 +35,13 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Ignore everything in src/env except specific files
+src/env/*
+!src/env/local.mjs
+!src/env/development.mjs
+
+# Include next.config.mjs explicitly
+!next.config.mjs
+
 # vscode
 /.vscode/

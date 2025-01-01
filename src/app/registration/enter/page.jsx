@@ -22,30 +22,38 @@ export default function Component() {
   const [uploadProgress, setUploadProgress] = useState(0)
   const [previewUrl, setPreviewUrl] = useState('')
   const [nickName, setNickName] = useState('')
+  const [error, setError] = useState('')
 
-  const onDrop = useCallback((acceptedFiles) => {
-    const file = acceptedFiles[0]
+  const onDrop = useCallback((acceptedFiles, rejectedFiles) => {
+    const file = acceptedFiles[0];
+
+    if (rejectedFiles.length > 0) {
+      setError('ファイル形式またはサイズが不正です');
+      return;
+    }
+
     if (file) {
-      // setUploadedFile(file)
-      const imageUrl = URL.createObjectURL(file);
-      setUploadedFile({ file, preview: imageUrl });
-      // 画像URLをlocalStorageに保存
-      localStorage.setItem('uploadedImage', imageUrl);
-      // プレビュー表示
-      setPreviewUrl(imageUrl)
-      // Simulate upload progress
-      setUploadProgress(0)
+        const imageUrl = URL.createObjectURL(file);
+        setUploadedFile({ file, preview: imageUrl });
+        localStorage.setItem('uploadedImage', imageUrl);
+        localStorage.setItem('uploadedFileName', file.name);
+        localStorage.setItem('uploadedFileSize', file.size);
+        setPreviewUrl(imageUrl);
+        setUploadProgress(0);
+
       const interval = setInterval(() => {
         setUploadProgress((prev) => {
           if (prev >= 100) {
-            clearInterval(interval)
-            return 100
+            clearInterval(interval);
+            return 100;
           }
-          return prev + 10
-        })
-      }, 200)
+          return prev + 10;
+        });
+      }, 200);
+
+      setError(''); // エラーをクリア
     }
-  }, [])
+  }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -54,28 +62,81 @@ export default function Component() {
       'image/png': ['.png'],
     },
     maxSize: 5242880, // 5MB
-    multiple: false
-  })
+    multiple: false,
+  });
 
   const handleDelete = () => {
-    setUploadedFile(null)
-    setPreviewUrl('')
-    setUploadProgress(0)
-    setNickName('')
-  }
+    setUploadedFile(null);
+    setPreviewUrl('');
+    setUploadProgress(0);
+    setNickName('');
+    setError('');
+  };
+
+  const validateNickName = (value) => {
+    const maxLength = 20;
+    const pattern = /^[ぁ-んァ-ヶ一-龥０-９0-9a-zA-Z]+$/;
+
+    if (!pattern.test(value)) {
+      return 'コールネームには全角文字（ひらがな、カタカナ、漢字、数字、アルファベット）のみを入力してください';
+    }
+
+    if (value.length > maxLength) {
+      return `コールネームは最大${maxLength}文字までです`;
+    }
+
+    // ここで既存のニックネームとの重複をチェック
+    const existingNickNames = ['猫1', '猫2']; // 仮の既存データ
+    if (existingNickNames.includes(value)) {
+      return 'コールネームが重複しています';
+    }
+
+    return ''; // エラーなし
+  };
 
   const handleSetNickName = (e) => {
-    setNickName(e.target.value); // 入力された値を更新
-  };
+    const value = e.target.value;
+    setNickName(value);
+};
 
   const handleNextpage = () => {
+    const maxLength = 20;
+    const pattern = /^[ぁ-んァ-ヶ一-龥０-９0-9a-zA-Z]+$/;
+
+    if (!uploadedFile) {
+        alert('画像をアップロードしてください');
+        return;
+    }
+
+    if (!nickName) {
+        alert('コールネームを入力してください');
+        return;
+    }
+
+    if (!pattern.test(nickName)) {
+      return 'コールネームには全角文字（ひらがな、カタカナ、漢字、数字、アルファベット）のみを入力してください';
+        return;
+    }
+
+    if (nickName.length > maxLength) {
+        alert(`コールネームは最大${maxLength}文字までです`);
+        return;
+    }
+
+    // 既存のニックネームとの重複チェック
+    const existingNickNames = ['猫1', '猫2']; // 仮の既存データ
+    if (existingNickNames.includes(nickName)) {
+        alert('コールネームが重複しています');
+        return;
+    }
+
     router.push(`/registration/confirmation?nickName=${encodeURIComponent(nickName)}`);
-  };
+};
 
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-8">
       {/* Progress Steps */}
-      <StepBar/>
+      <StepBar currentStep={1}/>
 
       <div className="space-y-4">
         <h1 className="text-2xl font-bold">猫登録</h1>
@@ -89,8 +150,8 @@ export default function Component() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <div className="text-sm space-y-1">
-                <p className="font-medium">{uploadedFile.name}</p>
-                <p className="text-muted-foreground">{Math.round(uploadedFile.size / 1024)} KB</p>
+                <p className="font-medium">{uploadedFile.file.name}</p>
+                <p className="text-muted-foreground">{Math.round(uploadedFile.file.size / 1024)} KB</p>
               </div>
             </div>
             <Button variant="ghost" size="icon" onClick={handleDelete}>
@@ -121,6 +182,7 @@ export default function Component() {
                   </Tooltip>
                 </TooltipProvider>
               </div>
+              {error && <p className="text-red-500 text-sm">{error}</p>}
             </div>
           )}
         </div>
@@ -148,7 +210,7 @@ export default function Component() {
         </Button>
         <Button
           onClick={handleNextpage}
-          disabled={!uploadedFile}
+          disabled={!uploadedFile || !nickName || error}
         >
           登録内容を確認する
         </Button>
